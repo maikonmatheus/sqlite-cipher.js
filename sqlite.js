@@ -267,6 +267,7 @@ sqlite.prototype.change = function(file, oldPassword, newPassword, algorithm, ne
 					}else{
 						try{
 							this.connect(file, oldPassword, algorithm);
+							this.iv = null;
 							var decrypted = this.pvDecrypt(fs.readFileSync(file), algorithm, oldPassword);
 							var encrypted = this.pvEncrypt(decrypted,newAlgorithm, newPassword);
 							var buffer = Buffer.from(encrypted);
