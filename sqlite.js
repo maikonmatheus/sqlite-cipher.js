@@ -185,7 +185,11 @@ sqlite.prototype.decrypt = function(from, to, password, algorithm, options){
 			}
 		}
 		this.algorithm = algorithm || this.algorithm;
-		this.password = password || this.password;
+		// this.password = password || this.password;
+		const [key, iv] = compute(algorithm, password);
+		this.password = Buffer.from(key, 'hex');
+		this.iv = Buffer.from(iv, 'hex');
+		
 		if(this.algorithms.indexOf(this.algorithm)==-1){
 			throw "This algorithm is not supported";
 		}
@@ -216,7 +220,11 @@ sqlite.prototype.encrypt = function(from, to, password, algorithm, options){
 			}
 		}
 		this.algorithm = algorithm || this.algorithm;
-		this.password = password || this.password;
+		// this.password = password || this.password;
+		const [key, iv] = compute(algorithm, password);
+		this.password = Buffer.from(key, 'hex');
+		this.iv = Buffer.from(iv, 'hex');
+		
 		if(this.algorithms.indexOf(this.algorithm)==-1){
 			throw "This algorithm is not supported";
 		}
@@ -267,7 +275,7 @@ sqlite.prototype.change = function(file, oldPassword, newPassword, algorithm, ne
 					}else{
 						try{
 							this.connect(file, oldPassword, algorithm);
-							this.iv = null;
+							this.iv = null; // Mk
 							var decrypted = this.pvDecrypt(fs.readFileSync(file), algorithm, oldPassword);
 							var encrypted = this.pvEncrypt(decrypted,newAlgorithm, newPassword);
 							var buffer = Buffer.from(encrypted);
